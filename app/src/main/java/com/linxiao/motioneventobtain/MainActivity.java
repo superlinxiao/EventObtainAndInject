@@ -19,6 +19,14 @@ import android.widget.Toast;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ *
+ * 测试小结：
+ * 1.eventTime对ACTION_MOVE事件有影响，这个表示ACTION_MOVE事件被触发的时间。但是对DOWN和UP事件没有影响。
+ * 2.UP的优先级比MOVE的优先级打，如果在发送MOVE事件的时候（还没有执行MOVE），同时有UP事件被发送，那么
+ * 会执行UP事件和最后一个move事件，其他的move事件会被忽略。
+ *
+ */
 public class MainActivity extends AppCompatActivity {
 
   private static final String TAG = "MainActivity";
@@ -52,28 +60,32 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "clickX " + clickX + "   clickY" + clickY);
 
         long downTime = SystemClock.uptimeMillis();
-        MotionEvent down = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, clickX, clickY, 0);
+        MotionEvent down = MotionEvent.obtain(downTime, SystemClock.uptimeMillis()+1000, MotionEvent.ACTION_DOWN, clickX, clickY, 1);
         down.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
         injectEvent(down);
+        Log.d(TAG, "down downTime " + downTime);
+
 
 //        MotionEvent up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis() , MotionEvent.ACTION_UP, clickX, clickY, 0);
 //        up.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
 //        injectEvent(up);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
 //        button2.dispatchTouchEvent(down);
 //          MotionEvent up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis() + 100, MotionEvent.ACTION_UP, clickX, clickY, 0);
 //          up.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
 
-          if (i == 50) {
-            MotionEvent up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, clickX + i, clickY, 0);
-            up.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
-            injectEvent(up);
-            Log.d(TAG, "发出UP事件发出UP事件发出UP事件发出UP事件" + i);
-            continue;
-          }
+//          if (i == 50) {
+//            MotionEvent up = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, clickX + i, clickY, 1);
+//            up.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
+//            injectEvent(up);
+//            Log.d(TAG, "发出UP事件发出UP事件发出UP事件发出UP事件" + i);
+//            continue;
+//          }
 
-          MotionEvent move = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE , clickX + i, clickY, 0);
+          long downTime1 = SystemClock.uptimeMillis();
+          Log.d(TAG, "move downTime " + downTime1);
+          MotionEvent move = MotionEvent.obtain(downTime1, SystemClock.uptimeMillis() + 1000, MotionEvent.ACTION_MOVE, clickX + (i * 2), clickY, 1);
           move.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
 
 
@@ -98,12 +110,22 @@ public class MainActivity extends AppCompatActivity {
       }
     });
 
+    button2.setOnLongClickListener(new View.OnLongClickListener() {
+      @Override
+      public boolean onLongClick(View v) {
+        Toast.makeText(MainActivity.this, "long click", Toast.LENGTH_LONG).show();
+        return true;
+      }
+    });
+
     button2.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         touchNum++;
-        Log.d(TAG, "收到touch event.getActionMasked():" + event.getActionMasked() + "   " + "touchNum:" + touchNum + " event.getRawX() " + event.getRawX());
-        return true;
+
+        event.getDownTime();
+        Log.d(TAG, "收到touch event.getActionMasked():" + event.getActionMasked() + "   " + "touchNum:" + touchNum + " event.getRawX() " + event.getRawX()+"  event.getDownTime();"+event.getDownTime());
+        return false;
       }
     });
   }
