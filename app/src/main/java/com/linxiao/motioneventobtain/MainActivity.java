@@ -60,20 +60,20 @@ public class MainActivity extends AppCompatActivity {
 //        up.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
 //        injectEvent(up);
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100; i++) {
 //        button2.dispatchTouchEvent(down);
 //          MotionEvent up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis() + 100, MotionEvent.ACTION_UP, clickX, clickY, 0);
 //          up.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
 
-          if (i == 500) {
-            MotionEvent up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, clickX + i, clickY, 1);
+          if (i == 50) {
+            MotionEvent up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, clickX + i, clickY, 0);
             up.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
             injectEvent(up);
             Log.d(TAG, "发出UP事件发出UP事件发出UP事件发出UP事件" + i);
             continue;
           }
 
-          MotionEvent move = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE + 1000, clickX + i, clickY, 1);
+          MotionEvent move = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE , clickX + i, clickY, 0);
           move.setSource(InputDeviceCompat.SOURCE_TOUCHSCREEN);
 
 
