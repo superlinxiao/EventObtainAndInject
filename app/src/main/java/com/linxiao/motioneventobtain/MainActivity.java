@@ -16,8 +16,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.linxiao.motioneventobtain.event.EventInput;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *
@@ -29,12 +33,48 @@ import java.lang.reflect.Method;
  */
 public class MainActivity extends AppCompatActivity {
 
+  private static final String TAG = "event_input";
   @SuppressLint("ClickableViewAccessibility")
   @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Log.e(TAG,"BTN SECOND ONCLICK");
+      }
+    });
   }
 
+  /**
+   * 测试代码
+   * @param view
+   */
+  public void clickFirst(View view) {
+    TimerTask task = new TimerTask() {
+      @Override
+      public void run() {
+        sendJson();
+      }
+    };
+    Timer timer = new Timer();
+    timer.schedule(task,0,5000);
+  }
+
+  private void sendJson() {
+    EventInput input = new EventInput();
+    for (int i = 0; i < 100; i++) {
+      injectEvent(input, i/100f);
+    }
+  }
+
+  private void injectEvent(EventInput input, float s1) {
+    String s = "\"" + s1 + "\"";
+    input.sendJson("{\"o\":1,\"a\":0,\"i\":0,\"p\":[{\"x\":\"0.503617\",\"y\":" + s + ",\"p\":0}]}");
+    input.sendJson("{\"o\":1,\"a\":2,\"i\":0,\"p\":[{\"x\":\"0.501557\",\"y\":" + s + ",\"p\":0}]}");
+    input.sendJson("{\"o\":1,\"a\":1,\"i\":0,\"p\":[{\"x\":\"0.501557\",\"y\":" + s + ",\"p\":0}]}");
+  }
 }

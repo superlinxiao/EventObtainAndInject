@@ -47,9 +47,12 @@ public class EventInput {
   }
 
 
-//  {"h":1,"i":5,"m":[{"c":6,"o":1,"a":1,"i":0,"p":[{"x":"0.35306522","y":"0.43756443","p":0}]}]}
-  public void sendJson(String json){
-    parseAction("{\"o\":1,\"a\":0,\"i\":0,\"p\":[{\"x\":\"0.7854974\",\"y\":\"0.29490292\",\"p\":0}]}");
+  /**
+   * jni 调用入口
+   * @param json
+   */
+  public void sendJson(String json) {
+    parseAction(json);
   }
 
   public EventInput() {
@@ -156,87 +159,86 @@ public class EventInput {
         return;
       }
 
-      if (jsonRoot.has("v") && (jsonRoot.optInt("v") == 1)) {
-        int action = jsonRoot.optInt("a");
-        int index = jsonRoot.optInt("i");
-        int orientation = jsonRoot.optInt("o");
+      int action = jsonRoot.optInt("a");
+      int index = jsonRoot.optInt("i");
+      int orientation = jsonRoot.optInt("o");
 
-        JSONArray jsonArray = jsonRoot.getJSONArray("p");
-        List<MyPoint> myPointList = new ArrayList<>();
-        for (int j = 0; j < jsonArray.length(); j++) {
-          JSONObject pointJsonObj = jsonArray.optJSONObject(j);
-          MyPoint myPoint = new MyPoint();
-          float scaleX = Float.parseFloat(pointJsonObj.optString("x"));
-          float scaleY = Float.parseFloat(pointJsonObj.optString("y"));
-          int pointerId = pointJsonObj.optInt("p");
+      JSONArray jsonArray = jsonRoot.getJSONArray("p");
+      List<MyPoint> myPointList = new ArrayList<>();
+      for (int j = 0; j < jsonArray.length(); j++) {
+        JSONObject pointJsonObj = jsonArray.optJSONObject(j);
+        MyPoint myPoint = new MyPoint();
+        float scaleX = Float.parseFloat(pointJsonObj.optString("x"));
+        float scaleY = Float.parseFloat(pointJsonObj.optString("y"));
+        int pointerId = pointJsonObj.optInt("p");
 
-          if (orientation == 1) {//竖屏
-            myPoint.pointX = scaleX * 1080;
-            myPoint.pointY = scaleY * 1920;
-          } else {//横屏或其他按横屏处理
-            myPoint.pointX = scaleX * 1920;
-            myPoint.pointY = scaleY * 1080;
-          }
-
-          myPoint.pointerId = pointerId;
-          myPointList.add(myPoint);
+        if (orientation == 1) {//竖屏
+          myPoint.pointX = scaleX * 1080;
+          myPoint.pointY = scaleY * 1920;
+        } else {//横屏或其他按横屏处理
+          myPoint.pointX = scaleX * 1920;
+          myPoint.pointY = scaleY * 1080;
         }
 
-        if (myPointList != null || !myPointList.isEmpty()) {
-          try {
-            injectMotionEvent(myPointList, action, index, s);
-          } catch (Exception e) {
-            Log.e(TAG, "injectMotionEvent = " + e.toString());
-            saveToSDCard(TAG + " injectMotionEvent = " + e.toString() + " " + s);
-          }
-        } else {
-          Log.e(TAG, "points is wrong");
-          saveToSDCard(TAG + " points is wrong " + s);
+        myPoint.pointerId = pointerId;
+        myPointList.add(myPoint);
+      }
+
+      if (myPointList != null || !myPointList.isEmpty()) {
+        try {
+          injectMotionEvent(myPointList, action, index, s);
+        } catch (Exception e) {
+          Log.e(TAG, "injectMotionEvent = " + e.toString());
+          saveToSDCard(TAG + " injectMotionEvent = " + e.toString() + " " + s);
         }
       } else {
-        JSONArray jsonArr = jsonRoot.optJSONArray("m");
-
-        for (int i = 0; i < jsonArr.length(); i++) {
-          JSONObject jsonObject = jsonArr.getJSONObject(i);
-
-          int action = jsonObject.optInt("a");
-          int index = jsonObject.optInt("i");
-          int orientation = jsonObject.optInt("o");
-
-          JSONArray jsonArray = jsonObject.getJSONArray("p");
-          List<MyPoint> myPointList = new ArrayList<>();
-          for (int j = 0; j < jsonArray.length(); j++) {
-            JSONObject pointJsonObj = jsonArray.optJSONObject(j);
-            MyPoint myPoint = new MyPoint();
-            float scaleX = Float.parseFloat(pointJsonObj.optString("x"));
-            float scaleY = Float.parseFloat(pointJsonObj.optString("y"));
-            int pointerId = pointJsonObj.optInt("p");
-
-            if (orientation == 1) {//竖屏
-              myPoint.pointX = scaleX * 1080;
-              myPoint.pointY = scaleY * 1920;
-            } else {//横屏或其他按横屏处理
-              myPoint.pointX = scaleX * 1920;
-              myPoint.pointY = scaleY * 1080;
-            }
-
-            myPoint.pointerId = pointerId;
-            myPointList.add(myPoint);
-          }
-
-          if (myPointList != null || !myPointList.isEmpty()) {
-            try {
-              injectMotionEvent(myPointList, action, index, s);
-            } catch (Exception e) {
-              Log.e(TAG, "injectMotionEvent = " + e.toString());
-              saveToSDCard(TAG + " injectMotionEvent = " + e.toString() + " " + s);
-            }
-          } else {
-            Log.e(TAG, "points is wrong");
-            saveToSDCard(TAG + " points is wrong " + s);
-          }
-        }
+        Log.e(TAG, "points is wrong");
+        saveToSDCard(TAG + " points is wrong " + s);
       }
+//      } else {
+//        JSONArray jsonArr = jsonRoot.optJSONArray("m");
+//
+//        for (int i = 0; i < jsonArr.length(); i++) {
+//          JSONObject jsonObject = jsonArr.getJSONObject(i);
+//
+//          int action = jsonObject.optInt("a");
+//          int index = jsonObject.optInt("i");
+//          int orientation = jsonObject.optInt("o");
+//
+//          JSONArray jsonArray = jsonObject.getJSONArray("p");
+//          List<MyPoint> myPointList = new ArrayList<>();
+//          for (int j = 0; j < jsonArray.length(); j++) {
+//            JSONObject pointJsonObj = jsonArray.optJSONObject(j);
+//            MyPoint myPoint = new MyPoint();
+//            float scaleX = Float.parseFloat(pointJsonObj.optString("x"));
+//            float scaleY = Float.parseFloat(pointJsonObj.optString("y"));
+//            int pointerId = pointJsonObj.optInt("p");
+//
+//            if (orientation == 1) {//竖屏
+//              myPoint.pointX = scaleX * 1080;
+//              myPoint.pointY = scaleY * 1920;
+//            } else {//横屏或其他按横屏处理
+//              myPoint.pointX = scaleX * 1920;
+//              myPoint.pointY = scaleY * 1080;
+//            }
+//
+//            myPoint.pointerId = pointerId;
+//            myPointList.add(myPoint);
+//          }
+//
+//          if (myPointList != null || !myPointList.isEmpty()) {
+//            try {
+//              injectMotionEvent(myPointList, action, index, s);
+//            } catch (Exception e) {
+//              Log.e(TAG, "injectMotionEvent = " + e.toString());
+//              saveToSDCard(TAG + " injectMotionEvent = " + e.toString() + " " + s);
+//            }
+//          } else {
+//            Log.e(TAG, "points is wrong");
+//            saveToSDCard(TAG + " points is wrong " + s);
+//          }
+//        }
+//      }
 
     } catch (Exception e) {
       Log.e(TAG, "parseAction = " + e.toString());
@@ -247,8 +249,12 @@ public class EventInput {
   @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
   private void injectEvent(MotionEvent down) {
     try {
+//
+//      inputManager.injectInputEvent(event,
+//          InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH);
+
       Method injectInputEvent = InputManager.class.getMethod("injectInputEvent", InputEvent.class, int.class);
-      injectInputEvent.invoke(inputManager, down, 0);
+      injectInputEvent.invoke(inputManager, down, 2);
       down.recycle();
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
