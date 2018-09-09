@@ -44,6 +44,5 @@ public class MyApplication extends Application {
     } catch (Exception e) {
     }
     return code;
-
   }
 }
