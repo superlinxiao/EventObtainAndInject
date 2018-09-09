@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import com.linxiao.motioneventobtain.app.MyApplication;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -44,7 +45,14 @@ public class EventInput {
    */
   public void sendJson(String json) {
     Log.i("ctrl_net", "recv json: " + json);
-    parseAction(json);
+    try {
+      JSONArray jsonArray = new JSONArray(json);
+      for (int i = 0; i < jsonArray.length(); i++) {
+        parseAction(jsonArray.getString(i));
+      }
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
 
   public EventInput() {

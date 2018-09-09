@@ -42,12 +42,12 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 //
-    findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Log.e(TAG, "BTN SECOND ONCLICK");
-      }
-    });
+//    findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+//      @Override
+//      public void onClick(View v) {
+//        Log.e(TAG, "BTN SECOND ONCLICK");
+//      }
+//    });
     startService(new Intent(this, EventService.class));
   }
 
@@ -79,21 +79,9 @@ public class MainActivity extends AppCompatActivity {
   private void injectEvent(EventInput input, float s1) {
     start = System.currentTimeMillis();
     String s = "\"" + s1 + "\"";
-    input.sendJson("[{\"o\":1,\"a\":0,\"i\":0,\"p\":[{\"x\":\"0.503617\",\"y\":" + s + ",\"p\":0}]},{\\\"o\\\":1,\\\"a\\\":0,\\\"i\\\":0,\\\"p\\\":[{\\\"x\\\":\\\"0.503617\\\",\\\"y\\\":\" + s + \",\\\"p\\\":0}]},{\\\"o\\\":1,\\\"a\\\":0,\\\"i\\\":0,\\\"p\\\":[{\\\"x\\\":\\\"0.503617\\\",\\\"y\\\":\" + s + \",\\\"p\\\":0}]},{\\\"o\\\":1,\\\"a\\\":0,\\\"i\\\":0,\\\"p\\\":[{\\\"x\\\":\\\"0.503617\\\",\\\"y\\\":\" + s + \",\\\"p\\\":0}]}]");
 //    input.sendJson("{\"o\":1,\"a\":2,\"i\":0,\"p\":[{\"x\":\"0.501557\",\"y\":" + s + ",\"p\":0}]}");
+    input.sendJson("{\"o\":1,\"a\":0,\"i\":0,\"p\":[{\"x\":\"0.501557\",\"y\":" + s + ",\"p\":0}]}");
     input.sendJson("{\"o\":1,\"a\":1,\"i\":0,\"p\":[{\"x\":\"0.501557\",\"y\":" + s + ",\"p\":0}]}");
   }
 
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-//    if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-//      long dx = System.currentTimeMillis() - start;
-//      Log.e(TAG, "down inject耗时:" + dx);
-//    }
-//    if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-//      long dx = System.currentTimeMillis() - start;
-//      Log.e(TAG, "up inject耗时:" + dx);
-//    }
-    return super.onTouchEvent(event);
-  }
 }

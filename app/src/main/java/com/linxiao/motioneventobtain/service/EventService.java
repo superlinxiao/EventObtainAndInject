@@ -42,20 +42,25 @@ public class EventService extends Service {
   public int onStartCommand(Intent intent, int flags, int startId) {
     initInjectLooper();
     initSocketThread();
-    test();
+//    new Handler().postDelayed(new Runnable() {
+//      @Override
+//      public void run() {
+//        test();
+//      }
+//    },2000);
     return START_STICKY;
   }
 
   private void test() {
-    String dwon ="{\"o\":1,\"a\":0,\"i\":0,\"p\":[{\"x\":\"0.76985395\",\"y\":\"0.25734934\",\"p\":0}]}";
-    String up ="{\"o\":1,\"a\":2,\"i\":0,\"p\":[{\"x\":\"0.76985395\",\"y\":\"0.25734934\",\"p\":0}]}";
+    String dwon ="[{\"o\":1,\"a\":0,\"i\":0,\"p\":[{\"x\":\"0.56985395\",\"y\":\"0.55734934\",\"p\":0}]},{\"o\":1,\"a\":1,\"i\":0,\"p\":[{\"x\":\"0.56985395\",\"y\":\"0.55734934\",\"p\":0}]}]";
+//    String up ="{\"o\":1,\"a\":1,\"i\":0,\"p\":[{\"x\":\"0.56985395\",\"y\":\"0.55734934\",\"p\":0}]}";
 
     Message obtain = Message.obtain();
     obtain.obj = dwon;
     renderThreadHandler.sendMessage(obtain);
-    Message upEvent = Message.obtain();
-    upEvent.obj = up;
-    renderThreadHandler.sendMessage(upEvent);
+//    Message upEvent = Message.obtain();
+//    upEvent.obj = up;
+//    renderThreadHandler.sendMessage(upEvent);
   }
 
   private void initSocketThread() {
@@ -92,7 +97,7 @@ public class EventService extends Service {
         try {
           while (true) {
             if (!socket.isConnected()) {
-              Thread.sleep(5000);
+              Thread.sleep(500);
               continue;
             }
             cmdstr = in.readLine();
