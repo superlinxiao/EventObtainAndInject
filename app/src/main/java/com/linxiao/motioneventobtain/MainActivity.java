@@ -69,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void sendJson() {
-    EventInput input = new EventInput();
+//    EventInput input = new EventInput();
 //    for (int i = 0; i < 100; i++) {
 //      injectEvent(input, i / 100f);
 //    }
-    injectEvent(input, 0.5f);
+//    injectEvent(input, 0.5f);
   }
 
   private void injectEvent(EventInput input, float s1) {
