@@ -31,7 +31,7 @@ import java.util.List;
  */
 
 public class EventInput {
-  private static final String TAG = "server_ctrl";
+  private static final String TAG = "event_input";
   private static final String TAG_MSG = "ServerControlMsg";
   private InputManager im;
 
@@ -43,7 +43,7 @@ public class EventInput {
    * @param json
    */
   public void sendJson(String json) {
-    Log.i("ctrl_net", "recv json: " + json);
+    Log.e("ctrl_net", "recv json: " + json);
     parseAction(json);
   }
 
@@ -152,7 +152,7 @@ public class EventInput {
   @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
   private void injectEvent(MotionEvent down) {
     try {
-      Log.i("ctrl_net", "recv x " + down.getX()+"  recv y"+down.getY());
+      Log.e("ctrl_net", "recv x " + down.getX()+"  recv y"+down.getY());
       Method injectInputEvent = InputManager.class.getMethod("injectInputEvent", InputEvent.class, int.class);
       injectInputEvent.invoke(inputManager, down, 0);
       down.recycle();

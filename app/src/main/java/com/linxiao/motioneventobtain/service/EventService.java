@@ -12,6 +12,7 @@ import android.util.Log;
 import com.linxiao.motioneventobtain.event.EventInput;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -23,7 +24,7 @@ import java.net.Socket;
  */
 public class EventService extends Service {
 
-  private static final String TAG = "server_ctrl";
+  private static final String TAG = "event_input";
   private EventInput input;
   private Handler renderThreadHandler;
 
@@ -43,15 +44,6 @@ public class EventService extends Service {
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     return START_STICKY;
-  }
-
-  private void test() {
-    String dwon = "{\"o\":1,\"a\":0,\"i\":0,\"p\":[{\"x\":\"0.56985395\",\"y\":\"0.55734934\",\"p\":0}]}";
-    String up = "{\"o\":1,\"a\":1,\"i\":0,\"p\":[{\"x\":\"0.56985395\",\"y\":\"0.55734934\",\"p\":0}]}";
-
-    Message obtain = Message.obtain();
-    obtain.obj = dwon;
-    renderThreadHandler.sendMessage(obtain);
   }
 
   private void initSocketThread() {
@@ -74,10 +66,8 @@ public class EventService extends Service {
   }
 
   class doNetwork implements Runnable {
-    public BufferedReader in;
-
     public void run() {
-      while(true){
+      while (true) {
         try {
           connect();
           Thread.sleep(2000);
@@ -89,33 +79,32 @@ public class EventService extends Service {
 
     private void connect() {
       String h = "127.0.0.1";
+      Socket socket = null;
+      BufferedReader in = null;
       try {
-        Socket socket = new Socket(InetAddress.getByName(h), 7086);
-        //InputStream mInStream = socket.getInputStream();
+        socket = new Socket(InetAddress.getByName(h), 7086);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        Log.i(TAG, "connected");
-
-        String cmdstr;
-        try {
-          while (socket.isConnected()) {
-            cmdstr = in.readLine();
-            if (cmdstr != null) {
-
-              cmdstr = cmdstr.replace("\n", "");
-              Message obtain = Message.obtain();
-              obtain.obj = cmdstr;
-              renderThreadHandler.sendMessage(obtain);
-            }
-          }
-        } catch (Exception e) {
-          Log.e(TAG, "injectMotionEvent = " + e.toString());
-
-        } finally {
-          in.close();
-          socket.close();
+        String json = in.readLine();
+        while (json != null) {
+          json = json.replace("\n", "");
+          Message obtain = Message.obtain();
+          obtain.obj = json;
+          renderThreadHandler.sendMessage(obtain);
+          json = in.readLine();
         }
       } catch (Exception e) {
-        Log.i(TAG, "Unable to connect...\n");
+        Log.e(TAG, "Unable to connect...\n");
+      } finally {
+        try {
+          if (in != null) {
+            in.close();
+          }
+          if (socket != null) {
+            socket.close();
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
   }
