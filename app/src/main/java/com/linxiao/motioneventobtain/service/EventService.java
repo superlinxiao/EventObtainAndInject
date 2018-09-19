@@ -36,18 +36,12 @@ public class EventService extends Service {
   @Override
   public void onCreate() {
     super.onCreate();
+    initInjectLooper();
+    initSocketThread();
   }
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    initInjectLooper();
-    initSocketThread();
-//    new Handler().postDelayed(new Runnable() {
-//      @Override
-//      public void run() {
-//        test();
-//      }
-//    }, 2000);
     return START_STICKY;
   }
 
@@ -58,9 +52,6 @@ public class EventService extends Service {
     Message obtain = Message.obtain();
     obtain.obj = dwon;
     renderThreadHandler.sendMessage(obtain);
-//    Message upEvent = Message.obtain();
-//    upEvent.obj = up;
-//    renderThreadHandler.sendMessage(upEvent);
   }
 
   private void initSocketThread() {
