@@ -86,6 +86,17 @@ public class EventService extends Service {
     public BufferedReader in;
 
     public void run() {
+      while(true){
+        try {
+          connect();
+          Thread.sleep(2000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+
+    private void connect() {
       String h = "127.0.0.1";
       try {
         Socket socket = new Socket(InetAddress.getByName(h), 7086);
@@ -95,11 +106,7 @@ public class EventService extends Service {
 
         String cmdstr;
         try {
-          while (true) {
-            if (!socket.isConnected()) {
-              Thread.sleep(500);
-              continue;
-            }
+          while (socket.isConnected()) {
             cmdstr = in.readLine();
             if (cmdstr != null) {
 
@@ -107,7 +114,6 @@ public class EventService extends Service {
               Message obtain = Message.obtain();
               obtain.obj = cmdstr;
               renderThreadHandler.sendMessage(obtain);
-//              input.sendJson(cmdstr);
             }
           }
         } catch (Exception e) {
