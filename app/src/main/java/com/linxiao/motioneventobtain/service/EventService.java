@@ -71,6 +71,7 @@ public class EventService extends Service {
         try {
           connect();
           Thread.sleep(2000);
+          Log.e(TAG, "connect retry");
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
@@ -83,6 +84,9 @@ public class EventService extends Service {
       BufferedReader in = null;
       try {
         socket = new Socket(InetAddress.getByName(h), 7086);
+        if (socket.isConnected()) {
+          Log.e(TAG, "connect success");
+        }
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String json = in.readLine();
         while (json != null) {
@@ -92,8 +96,10 @@ public class EventService extends Service {
           renderThreadHandler.sendMessage(obtain);
           json = in.readLine();
         }
+        Log.e(TAG, "read null and disconnect");
       } catch (Exception e) {
-        Log.e(TAG, "Unable to connect...\n");
+        e.printStackTrace();
+        Log.e(TAG, "error:" + e.getMessage());
       } finally {
         try {
           if (in != null) {
@@ -103,6 +109,7 @@ public class EventService extends Service {
             socket.close();
           }
         } catch (IOException e) {
+          Log.e(TAG, "error:" + e.getMessage());
           e.printStackTrace();
         }
       }
