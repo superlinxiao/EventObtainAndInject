@@ -10,12 +10,31 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="clickFirst"
-        android:text="button first" />
+        android:onClick="startService"
+
+        android:text="startService"
+        android:textAllCaps="false" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="stopService"
+        android:text="stopService"
+
+        android:textAllCaps="false" />
 
     <Button
         android:id="@+id/btn"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="button second" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="bindService"
+        android:text="bindService"
+        android:textAllCaps="false" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="unbindservice"
+        android:text="unbindService"
+        android:textAllCaps="false" />
 </LinearLayout>

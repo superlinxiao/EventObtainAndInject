@@ -1,39 +1,32 @@
 package com.linxiao.motioneventobtain;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.hardware.input.InputManager;
+import android.content.ServiceConnection;
 import android.os.Build;
-import android.os.SystemClock;
+import android.os.IBinder;
 import android.support.annotation.RequiresApi;
-import android.support.v4.view.InputDeviceCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.InputEvent;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.linxiao.motioneventobtain.event.EventInput;
 import com.linxiao.motioneventobtain.service.EventService;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Timer;
-import java.util.TimerTask;
-
 /**
  * 测试小结：
- * 1.eventTime对ACTION_MOVE事件有影响，这个表示ACTION_MOVE事件被触发的时间。但是对DOWN和UP事件没有影响。
- * 2.UP的优先级比MOVE的优先级打，如果在发送MOVE事件的时候（还没有执行MOVE），同时有UP事件被发送，那么
- * 会执行UP事件和最后一个move事件，其他的move事件会被忽略。
+ * 1.bindserver不执行onStartCommand
+ * 2.oncreate只执行一次,onbind也只执行一次，在一个activity中多次bind，返回的都是统一binder
+ * 3.startservice > oncreate > onStartCommand>stopservice> onDestroy
+ * 4.bindservice >onCreate >onBind >all unbind>onDestroy
  */
 public class MainActivity extends AppCompatActivity {
   private static final String TAG = "event_input";
   private long start;
+  private ServiceConnection conn;
+  private Intent service;
 
   @SuppressLint("ClickableViewAccessibility")
   @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -48,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
 //        Log.e(TAG, "BTN SECOND ONCLICK");
 //      }
 //    });
+    startTestService();
+  }
+
+  private void startTestService() {
     startService(new Intent(this, EventService.class));
   }
 
@@ -65,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
 //    };
 //    Timer timer = new Timer();
 //    timer.schedule(task, 0, 5000);
-    sendJson();
+//    sendJson();
+    startTestService();
   }
 
   private void sendJson() {
@@ -84,4 +82,39 @@ public class MainActivity extends AppCompatActivity {
     input.sendJson("{\"o\":1,\"a\":1,\"i\":0,\"p\":[{\"x\":\"0.501557\",\"y\":" + s + ",\"p\":0}]}");
   }
 
+  public void bindService(View view) {
+    conn = new ServiceConnection() {
+      @Override
+      public void onServiceConnected(ComponentName name, IBinder service) {
+
+        EventService.MyBinder myBinder = (EventService.MyBinder) service;
+        myBinder.test();
+        Log.i(TAG, "onServiceConnected");
+      }
+
+      @Override
+      public void onServiceDisconnected(ComponentName name) {
+        //只有在异常中断的时候，才会调用
+        Log.i(TAG, "onServiceDisconnected");
+      }
+    };
+    Intent service = new Intent(this, EventService.class);
+    bindService(service, conn, BIND_AUTO_CREATE);
+
+  }
+
+  public void unbindservice(View view) {
+    //如果已经解绑过一次，再次调用会报错，Service not registered
+    unbindService(conn);
+  }
+
+  public void stopService(View view) {
+    stopService(service);
+//    stopService(new Intent(this, EventService.class));
+  }
+
+  public void startService(View view) {
+    service = new Intent(this, EventService.class);
+    startService(service);
+  }
 }
